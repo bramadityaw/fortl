@@ -19,7 +19,7 @@ import System.FilePath ((</>))
 import GHC.IO.Exception (IOErrorType(..), ioe_type)
 
 import Control.Monad (when)
-import Control.Exception (try, evaluate, IOException)
+import Control.Exception (try, IOException)
 
 banner :: String
 banner = "fortl v0.3.0 - Programming for science"
