@@ -33,7 +33,7 @@ main = do
   -- Get command line args
   case args of
     [] -> putStrLn "Please supply a filename as a command line argument"
-    ["--help"] -> putStr helpMessage
+    ("--help":_) -> putStr helpMessage
     -- If we have at least one
     (fname:_) -> do
       result <- run True fname
@@ -64,8 +64,6 @@ run report fname = do
                       <> "Not well-formed.\n" <> errorToString err <> ansi_reset
               return $ Left (errorToString err)
             Right ast -> do
-              -- Evaluate
-              let (env, normalForm) = interpret options ast
               -- Typing
               case typeCheck options ast of
                 Left err -> do
@@ -74,9 +72,13 @@ run report fname = do
                     <> "Not well-typed.\n" <> errorToString err <> ansi_reset
                   return $ Left (errorToString err)
                 Right (ctxt, ty) -> do
+                  -- Evaluate
+                  let (env, normalForm) = interpret options ast
+
                   putStrLn $ ansi_bold <> ansi_green
                     <> "Well-typed " <> ansi_reset
                     <> ansi_bold <> "as " <> ansi_reset <> pprint ty
+
                   return $ Right (parsetree, options, env, normalForm, ctxt)
         Left msg -> do
           putStrLn $ ansi_red ++ "Error: " ++ ansi_reset ++ msg
@@ -87,6 +89,7 @@ typeCheck options program =
     case typeCheckProgram program of
         Right ty -> Right ty
         Left err -> Left err
+
 ansi_red, ansi_green, ansi_reset, ansi_bold :: String
 ansi_red   = "\ESC[31;1m"
 ansi_green = "\ESC[32;1m"
